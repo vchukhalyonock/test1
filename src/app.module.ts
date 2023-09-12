@@ -10,13 +10,22 @@ import { CountryModule } from './country/country.module';
 import { RateEntity } from './rate/entities/rate.entity';
 import { ExchangeModule } from './exchange/exchange.module';
 import { ExchangeEntity } from './exchange/entities/exchange.entity';
+import { CommandModule } from 'nestjs-command';
+import { CliCommand } from './cli/cli.command';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     TypeOrmModule.forRootAsync({
       useFactory: () => ({
         type: 'postgres',
-        host: process.env.POSTGRES_HOST,
+        host:
+          process.env.NODE_ENV === 'local'
+            ? '127.0.0.1'
+            : process.env.POSTGRES_HOST,
         port: parseInt(process.env.POSTGRES_PORT),
         username: process.env.POSTGRES_USER,
         password: process.env.POSTGRES_PASSWORD,
@@ -35,12 +44,13 @@ import { ExchangeEntity } from './exchange/entities/exchange.entity';
         logging: process.env.POSTGRES_LOGGING === 'true',
       }),
     }),
+    CommandModule,
     ExchangeOfficeModule,
     RateModule,
     CountryModule,
     ExchangeModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, CliCommand],
 })
 export class AppModule {}
