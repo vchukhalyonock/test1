@@ -18,8 +18,11 @@ export class ExchangeEntity {
   @Column({ type: 'varchar', length: 3, nullable: false })
   to: string;
 
-  @Column({ type: 'int', nullable: false })
+  @Column({ type: 'float', nullable: false })
   ask: number;
+
+  @Column({ type: 'float', nullable: false })
+  bid: number;
 
   @Column({
     type: 'time without time zone',

@@ -34,7 +34,12 @@ export class AddExchangesTable1694529769613 implements MigrationInterface {
           },
           {
             name: 'ask',
-            type: 'int',
+            type: 'float',
+            isNullable: false,
+          },
+          {
+            name: 'bid',
+            type: 'float',
             isNullable: false,
           },
           {

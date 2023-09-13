@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { Command, Positional } from 'nestjs-command';
+import { CliService } from './cli.service';
 
 @Injectable()
 export class CliCommand {
+  constructor(private readonly cliService: CliService) {}
   @Command({
     command: 'file:apply <filename>',
     describe: 'apply file content',
@@ -12,6 +14,6 @@ export class CliCommand {
     filename: string,
   ) {
     console.log('Run applyFile');
-    console.log({ filename });
+    await this.cliService.importDataFromFile(filename);
   }
 }

@@ -13,6 +13,9 @@ import { ExchangeEntity } from './exchange/entities/exchange.entity';
 import { CommandModule } from 'nestjs-command';
 import { CliCommand } from './cli/cli.command';
 import { ConfigModule } from '@nestjs/config';
+import { FileModule } from './file/file.module';
+import { CliModule } from './cli/cli.module';
+import { FormatterModule } from './formatter/formatter.module';
 
 @Module({
   imports: [
@@ -49,8 +52,11 @@ import { ConfigModule } from '@nestjs/config';
     RateModule,
     CountryModule,
     ExchangeModule,
+    FileModule,
+    CliModule,
+    FormatterModule,
   ],
   controllers: [AppController],
-  providers: [AppService, CliCommand],
+  providers: [AppService],
 })
 export class AppModule {}

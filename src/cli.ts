@@ -5,7 +5,7 @@ import * as process from 'process';
 
 async function bootstrap() {
   const app = await NestFactory.createApplicationContext(AppModule, {
-    logger: false,
+    logger: ['log', 'error', 'warn', 'debug', 'verbose'],
   });
 
   try {
