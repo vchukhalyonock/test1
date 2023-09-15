@@ -1,83 +1,101 @@
 import { Injectable } from '@nestjs/common';
 import { ExchangeOfficeEntity } from '../exchange-office/entities/exchange-office.entity';
-import {
-  createObjectFromLines,
-  nestLevel,
-  takeAllLinesForObject,
-} from './functions';
+import { DataParserInterface } from './interfaces/data-parser.interface';
+import { OfficeExchangerDataResultDto } from './dto/office-exchanger-data-result.dto';
+import { NEST_SYMBOL, NEST_SYMBOLS_NUMBER } from './formatter.consts';
 
 @Injectable()
-export class FormatterService {
-  mapFileContentToExchangeOfficesData(content: string): ExchangeOfficeEntity[] {
-    const result: ExchangeOfficeEntity[] = [];
-    let topLevelObject: ExchangeOfficeEntity;
-    const contentLines = content.split('\n');
+export class FormatterService implements DataParserInterface {
+  private lines: string[] = [];
+  private index: number = 0;
+  mapContent(content: string): OfficeExchangerDataResultDto {
+    this.lines = this.makeLinesFromContent(content);
 
-    let index = 0;
+    const exchangeOfficeEntities: ExchangeOfficeEntity[] = [];
+    let topLevelObject: ExchangeOfficeEntity = new ExchangeOfficeEntity();
     let arrayName: string;
-    while (contentLines.length > index) {
-      const currentLine = contentLines[index];
+    while (this.lines.length > this.index) {
+      const currentLine = this.lines[this.index];
       if (currentLine.trim() === '') {
-        index++;
+        this.index++;
         continue;
       }
-      const currentLevel = nestLevel(currentLine);
-      if (currentLevel === 0) {
-        topLevelObject = new ExchangeOfficeEntity();
-        topLevelObject.exchanges = [];
-        topLevelObject.rates = [];
-        const topLevelObjectLinesResult = takeAllLinesForObject(
-          contentLines,
-          index + 2,
-          currentLevel + 2,
-        );
-        index = topLevelObjectLinesResult.index;
-        const exchangeOfficeObject = createObjectFromLines(
-          topLevelObjectLinesResult.lines,
-        );
-        result.push({ ...topLevelObject, ...exchangeOfficeObject });
-        continue;
-      } else if (currentLevel % 2 != 0) {
-        //object name
-        if (currentLine.trim() === 'exchange-office') {
-          topLevelObject = new ExchangeOfficeEntity();
-          topLevelObject.exchanges = [];
-          topLevelObject.rates = [];
-          const topLevelObjectLinesResult = takeAllLinesForObject(
-            contentLines,
-            index + 1,
-            currentLevel + 1,
-          );
-          index = topLevelObjectLinesResult.index;
-          const exchangeOfficeObject = createObjectFromLines(
-            topLevelObjectLinesResult.lines,
-          );
-          result.push({ ...topLevelObject, ...exchangeOfficeObject });
-          continue;
+      const currentLevel = this.nestLevel(currentLine);
+      if (currentLevel % 2 == 0) {
+        if (currentLevel === 0 && currentLine === 'exchange-offices') {
+          this.index++;
         } else {
-          index++;
-          continue;
+          if (currentLine.includes('=') && arrayName) {
+            topLevelObject[arrayName].push(this.makeObject(currentLevel));
+          } else {
+            arrayName = currentLine.trim();
+            this.index++;
+          }
         }
-      } else if (currentLine.includes('=')) {
-        //property
-        const objectLinesResult = takeAllLinesForObject(
-          contentLines,
-          index,
-          currentLevel,
-        );
-        index = objectLinesResult.index;
-        const object = createObjectFromLines(objectLinesResult.lines);
-        if (topLevelObject && arrayName) {
-          topLevelObject[arrayName].push(object);
-        }
-        continue;
       } else {
-        //array name
-        arrayName = currentLine.trim();
+        if (currentLine.trim() === 'exchange-office') {
+          topLevelObject = this.makeOffice(currentLevel);
+          exchangeOfficeEntities.push(topLevelObject);
+        } else {
+          this.index++;
+        }
       }
-      index++;
     }
 
+    return {
+      exchangeOffices: exchangeOfficeEntities,
+      countries: [],
+    };
+  }
+
+  private makeLinesFromContent(content: string): string[] {
+    return content.split('\n');
+  }
+
+  private makeOffice(level: number): ExchangeOfficeEntity {
+    const exchangeOfficeEntity = new ExchangeOfficeEntity();
+    exchangeOfficeEntity.exchanges = [];
+    exchangeOfficeEntity.rates = [];
+    this.index++;
+    const linesForObject = this.takeAllLinesForObject(level + 1);
+    const obj = this.createObjectFromLines(linesForObject);
+    return { ...exchangeOfficeEntity, ...obj };
+  }
+
+  private makeObject(currentLevel: number) {
+    const objectLinesResult = this.takeAllLinesForObject(currentLevel);
+    return this.createObjectFromLines(objectLinesResult);
+  }
+
+  private takeAllLinesForObject(level: number): string[] {
+    const result = [];
+    for (; this.index < this.lines.length; this.index++) {
+      const line = this.lines[this.index];
+      const currentLevel = this.nestLevel(line);
+      if (currentLevel !== level) break;
+      if (!line.includes('=')) break;
+      result.push(line);
+    }
     return result;
+  }
+
+  private nestLevel(line: string): number {
+    let multiplier = 0;
+    let nestString = '';
+    let level = 0;
+    while (line.startsWith(nestString)) {
+      level++;
+      multiplier += NEST_SYMBOLS_NUMBER;
+      nestString = NEST_SYMBOL.repeat(multiplier);
+    }
+    return level - 1;
+  }
+
+  private createObjectFromLines(lines: string[]) {
+    return lines.reduce((acc, line) => {
+      const parts = line.split('=');
+      acc[parts[0].trim()] = parts[1].trim();
+      return acc;
+    }, {});
   }
 }

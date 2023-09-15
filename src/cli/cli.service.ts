@@ -20,8 +20,7 @@ export class CliService {
 
   async importDataFromFile(filename: string) {
     const content = await this.fileService.readContent(filename);
-    const exchangeOffices =
-      this.formatterService.mapFileContentToExchangeOfficesData(content);
+    const exchangeOffices = this.formatterService.mapContent(content);
     console.log(JSON.stringify(exchangeOffices));
   }
 }
