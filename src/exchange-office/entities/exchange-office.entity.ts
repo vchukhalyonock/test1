@@ -1,10 +1,10 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
 import { RateEntity } from '../../rate/entities/rate.entity';
 import { ExchangeEntity } from '../../exchange/entities/exchange.entity';
 
-@Entity('exchange-office')
+@Entity('exchange_offices')
 export class ExchangeOfficeEntity {
-  @PrimaryGeneratedColumn()
+  @PrimaryColumn()
   id: number;
 
   @Column({ type: 'varchar', length: 255, nullable: false })

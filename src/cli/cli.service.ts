@@ -20,7 +20,21 @@ export class CliService {
 
   async importDataFromFile(filename: string) {
     const content = await this.fileService.readContent(filename);
-    const exchangeOffices = this.parserService.mapContent(content);
-    console.log(JSON.stringify(exchangeOffices));
+    const { countries, exchangeOffices } =
+      this.parserService.mapContent(content);
+
+    await this.countryService.updateCountries(countries);
+
+    await this.exchangeOfficeService.updateOffices(exchangeOffices);
+
+    for (const office of exchangeOffices) {
+      const { id } = office;
+      const rates = office.rates.map((r) => ({ ...r, officeId: id }));
+      const exchanges = office.exchanges.map((e) => ({ ...e, officeId: id }));
+
+      await this.rateService.insertRates(rates);
+
+      await this.exchangeService.insertExchanges(exchanges);
+    }
   }
 }

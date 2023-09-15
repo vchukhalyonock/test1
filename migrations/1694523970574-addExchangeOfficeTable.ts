@@ -24,7 +24,7 @@ export class AddExchangeOfficeTable1694523970574 implements MigrationInterface {
           {
             name: 'country',
             type: 'varchar',
-            length: '2',
+            length: '3',
             isNullable: false,
           },
         ],

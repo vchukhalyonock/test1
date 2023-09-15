@@ -10,7 +10,7 @@ export class AddCountryTable1694523387136 implements MigrationInterface {
           {
             name: 'code',
             type: 'varchar',
-            length: '2',
+            length: '3',
             isPrimary: true,
             isNullable: false,
           },

@@ -12,6 +12,9 @@ export class ExchangeEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ name: 'office_id', type: 'int', nullable: false })
+  officeId: number;
+
   @Column({ type: 'varchar', length: 3, nullable: false })
   from: string;
 

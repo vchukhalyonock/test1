@@ -21,14 +21,14 @@ exchange-offices
         in = 1.1
         out = 1
         reserve = 120000
-        date = 2023-04-24 22:55:33
+        date = 2023-04-23 22:55:33
       rate
         from = USD
         to = UAH
         in = 1
         out = 40
         reserve = 150000
-        date = 2023-04-24 22:55:33
+        date = 2023-04-22 22:55:33
   exchange-office
     id = 2
     name = Exchanger 2
