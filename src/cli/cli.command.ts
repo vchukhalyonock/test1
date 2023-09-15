@@ -13,7 +13,6 @@ export class CliCommand {
     @Positional({ name: 'filename', describe: 'filename', type: 'string' })
     filename: string,
   ) {
-    console.log('Run applyFile');
     await this.cliService.importDataFromFile(filename);
   }
 }

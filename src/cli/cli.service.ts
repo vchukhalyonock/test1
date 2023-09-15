@@ -19,21 +19,28 @@ export class CliService {
   ) {}
 
   async importDataFromFile(filename: string) {
+    this.logger.log('Start importing process');
     const content = await this.fileService.readContent(filename);
     const { countries, exchangeOffices } =
       this.parserService.mapContent(content);
 
+    this.logger.log('Importing countries');
     await this.countryService.updateCountries(countries);
 
+    this.logger.log('Importing offices');
     await this.exchangeOfficeService.updateOffices(exchangeOffices);
 
+    this.logger.log('Start importing rates and exchanges');
     for (const office of exchangeOffices) {
+      this.logger.log(`Processing office ${office.name}:`);
       const { id } = office;
       const rates = office.rates.map((r) => ({ ...r, officeId: id }));
       const exchanges = office.exchanges.map((e) => ({ ...e, officeId: id }));
 
+      this.logger.log('-- Insert rates');
       await this.rateService.insertRates(rates);
 
+      this.logger.log('-- Calculate bids and insert exchanges');
       await this.exchangeService.insertExchanges(exchanges);
     }
   }
