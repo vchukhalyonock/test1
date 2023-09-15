@@ -3,6 +3,7 @@ import { ExchangeOfficeEntity } from '../exchange-office/entities/exchange-offic
 import { DataParserInterface } from './interfaces/data-parser.interface';
 import { OfficeExchangerDataResultDto } from './dto/office-exchanger-data-result.dto';
 import { NEST_SYMBOL, NEST_SYMBOLS_NUMBER } from './formatter.consts';
+import { CountryEntity } from '../country/entities/country.entity';
 
 @Injectable()
 export class FormatterService implements DataParserInterface {
@@ -12,7 +13,8 @@ export class FormatterService implements DataParserInterface {
     this.lines = this.makeLinesFromContent(content);
 
     const exchangeOfficeEntities: ExchangeOfficeEntity[] = [];
-    let topLevelObject: ExchangeOfficeEntity = new ExchangeOfficeEntity();
+    const countryEntities: CountryEntity[] = [];
+    let exchangeOfficeEntity = new ExchangeOfficeEntity();
     let arrayName: string;
     while (this.lines.length > this.index) {
       const currentLine = this.lines[this.index];
@@ -22,11 +24,11 @@ export class FormatterService implements DataParserInterface {
       }
       const currentLevel = this.nestLevel(currentLine);
       if (currentLevel % 2 == 0) {
-        if (currentLevel === 0 && currentLine === 'exchange-offices') {
+        if (currentLevel === 0) {
           this.index++;
         } else {
           if (currentLine.includes('=') && arrayName) {
-            topLevelObject[arrayName].push(this.makeObject(currentLevel));
+            exchangeOfficeEntity[arrayName].push(this.makeObject(currentLevel));
           } else {
             arrayName = currentLine.trim();
             this.index++;
@@ -34,8 +36,10 @@ export class FormatterService implements DataParserInterface {
         }
       } else {
         if (currentLine.trim() === 'exchange-office') {
-          topLevelObject = this.makeOffice(currentLevel);
-          exchangeOfficeEntities.push(topLevelObject);
+          exchangeOfficeEntity = this.makeOffice(currentLevel);
+          exchangeOfficeEntities.push(exchangeOfficeEntity);
+        } else if (currentLine.trim() === 'country') {
+          countryEntities.push(this.makeCountry(currentLevel));
         } else {
           this.index++;
         }
@@ -44,7 +48,7 @@ export class FormatterService implements DataParserInterface {
 
     return {
       exchangeOffices: exchangeOfficeEntities,
-      countries: [],
+      countries: countryEntities,
     };
   }
 
@@ -57,8 +61,7 @@ export class FormatterService implements DataParserInterface {
     exchangeOfficeEntity.exchanges = [];
     exchangeOfficeEntity.rates = [];
     this.index++;
-    const linesForObject = this.takeAllLinesForObject(level + 1);
-    const obj = this.createObjectFromLines(linesForObject);
+    const obj = this.makeObject(level + 1);
     return { ...exchangeOfficeEntity, ...obj };
   }
 
@@ -97,5 +100,12 @@ export class FormatterService implements DataParserInterface {
       acc[parts[0].trim()] = parts[1].trim();
       return acc;
     }, {});
+  }
+
+  private makeCountry(level: number): CountryEntity {
+    const countryEntity = new CountryEntity();
+    this.index++;
+    const obj = this.makeObject(level + 1);
+    return { ...countryEntity, ...obj };
   }
 }

@@ -59,3 +59,10 @@ exchange-offices
         out = 80
         reserve = 150000
         date = 2023-04-24 22:55:33
+countries
+  country
+    code = UKR
+    name = Ukraine
+  country
+    code = USA
+    name = United States
