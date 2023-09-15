@@ -5,13 +5,13 @@ import { CountryModule } from '../country/country.module';
 import { ExchangeModule } from '../exchange/exchange.module';
 import { ExchangeOfficeModule } from '../exchange-office/exchange-office.module';
 import { RateModule } from '../rate/rate.module';
-import { FormatterModule } from '../formatter/formatter.module';
+import { ParserModule } from '../parser/parser.module';
 import { FileModule } from '../file/file.module';
 
 @Module({
   imports: [
     FileModule,
-    FormatterModule,
+    ParserModule,
     CountryModule,
     ExchangeModule,
     ExchangeOfficeModule,

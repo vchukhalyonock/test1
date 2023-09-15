@@ -15,7 +15,7 @@ import { CliCommand } from './cli/cli.command';
 import { ConfigModule } from '@nestjs/config';
 import { FileModule } from './file/file.module';
 import { CliModule } from './cli/cli.module';
-import { FormatterModule } from './formatter/formatter.module';
+import { ParserModule } from './parser/parser.module';
 
 @Module({
   imports: [
@@ -54,7 +54,7 @@ import { FormatterModule } from './formatter/formatter.module';
     ExchangeModule,
     FileModule,
     CliModule,
-    FormatterModule,
+    ParserModule,
   ],
   controllers: [AppController],
   providers: [AppService],

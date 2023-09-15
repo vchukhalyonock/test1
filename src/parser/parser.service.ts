@@ -2,11 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { ExchangeOfficeEntity } from '../exchange-office/entities/exchange-office.entity';
 import { DataParserInterface } from './interfaces/data-parser.interface';
 import { OfficeExchangerDataResultDto } from './dto/office-exchanger-data-result.dto';
-import { NEST_SYMBOL, NEST_SYMBOLS_NUMBER } from './formatter.consts';
+import { NEST_SYMBOL, NEST_SYMBOLS_NUMBER } from './parser.consts';
 import { CountryEntity } from '../country/entities/country.entity';
 
 @Injectable()
-export class FormatterService implements DataParserInterface {
+export class ParserService implements DataParserInterface {
   private lines: string[] = [];
   private index: number = 0;
   mapContent(content: string): OfficeExchangerDataResultDto {

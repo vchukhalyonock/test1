@@ -3,7 +3,7 @@ import { CountryService } from '../country/country.service';
 import { ExchangeService } from '../exchange/exchange.service';
 import { ExchangeOfficeService } from '../exchange-office/exchange-office.service';
 import { RateService } from '../rate/rate.service';
-import { FormatterService } from '../formatter/formatter.service';
+import { ParserService } from '../parser/parser.service';
 import { FileService } from '../file/file.service';
 
 @Injectable()
@@ -11,7 +11,7 @@ export class CliService {
   private readonly logger = new Logger(CliService.name);
   constructor(
     private readonly fileService: FileService,
-    private readonly formatterService: FormatterService,
+    private readonly parserService: ParserService,
     private readonly countryService: CountryService,
     private readonly exchangeService: ExchangeService,
     private readonly exchangeOfficeService: ExchangeOfficeService,
@@ -20,7 +20,7 @@ export class CliService {
 
   async importDataFromFile(filename: string) {
     const content = await this.fileService.readContent(filename);
-    const exchangeOffices = this.formatterService.mapContent(content);
+    const exchangeOffices = this.parserService.mapContent(content);
     console.log(JSON.stringify(exchangeOffices));
   }
 }
