@@ -22,7 +22,8 @@
     "migration:run": "npm run typeorm migration:run -- -d ./typeOrm.config.ts",
     "migration:generate": "npm run typeorm -- -d ./typeOrm.config.ts migration:generate ./migrations/$npm_config_name",
     "migration:create": "npm run typeorm -- migration:create ./migrations/$npm_config_name",
-    "migration:revert": "npm run typeorm -- -d ./typeOrm.config.ts migration:revert"
+    "migration:revert": "npm run typeorm -- -d ./typeOrm.config.ts migration:revert",
+    "file:apply": "npx nestjs-command file:apply"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
